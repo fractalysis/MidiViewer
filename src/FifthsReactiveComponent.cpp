@@ -11,8 +11,7 @@ bool FifthsReactiveComponent::initialize(){
 
     openGLContext->extensions.glGenBuffers (1, &vertexBuffer);
     openGLContext->extensions.glBindBuffer (GL_ARRAY_BUFFER, vertexBuffer);
-    std::vector<glm::vec2> tris = getTriangle();
-    openGLContext->extensions.glBufferData (GL_ARRAY_BUFFER, tris.size() * (int) sizeof (glm::vec2),
+    openGLContext->extensions.glBufferData (GL_ARRAY_BUFFER, tris.size() * (int) sizeof (Vertex),
                                                     tris.data(), GL_STATIC_DRAW);
 
     midiShader.reset(new OpenGLShaderProgram(*openGLContext));
@@ -38,10 +37,22 @@ void FifthsReactiveComponent::render() {
     openGLContext->extensions.glBindBuffer (GL_ARRAY_BUFFER, vertexBuffer);
 
     //VAO stuff (Not sure if we can make our own?)
-    openGLContext->extensions.glVertexAttribPointer (0, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), 0);
+    // Position
+    openGLContext->extensions.glVertexAttribPointer (0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
     openGLContext->extensions.glEnableVertexAttribArray (0);
+    // Opacity
+    openGLContext->extensions.glVertexAttribPointer (1, 1, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*) sizeof(glm::vec2));
+    openGLContext->extensions.glEnableVertexAttribArray (1);
 
-    glDrawArrays(GL_TRIANGLES, 0, getTriangle().size());
+    // Enable blending
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+    // Draw
+    midiShader->use();
+    glDrawArrays(GL_TRIANGLES, 0, tris.size());
+
+    // Clean up
     openGLContext->extensions.glDisableVertexAttribArray (0);
+    openGLContext->extensions.glDisableVertexAttribArray (1);
 }

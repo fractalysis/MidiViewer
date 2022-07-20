@@ -50,6 +50,8 @@ public:
         openGLContext->extensions.glVertexAttribPointer (0, 2, GL_FLOAT, GL_FALSE, sizeof (glm::vec2), nullptr);
         openGLContext->extensions.glEnableVertexAttribArray (0);
 
+        //Bind shader
+        shaderTest->use();
         glDrawArrays(GL_TRIANGLES,0,getTriangle().size());
 
         openGLContext->extensions.glDisableVertexAttribArray (0);

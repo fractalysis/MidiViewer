@@ -6,5 +6,5 @@ out float opacity;
 
 void main(){
    gl_Position = vec4(aPos,0,1);
-   opacity = 1;
+   opacity = 0.5;
 }
