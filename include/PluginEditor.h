@@ -13,7 +13,7 @@
 #include "PluginProcessor.h"
 #include "OpenGLEditor.h"
 
-#include "TriangleTestComponent.h"
+#include "FifthsReactiveComponent.h"
 
 //==============================================================================
 /**
@@ -34,7 +34,7 @@ private:
     MidiViewerAudioProcessor& audioProcessor;
 
     std::unique_ptr<Drawable> bg;
-    TriangleTestComponent comp;
+    FifthsReactiveComponent comp;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MidiViewerAudioProcessorEditor)
 };

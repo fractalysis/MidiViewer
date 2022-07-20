@@ -148,11 +148,37 @@ void MidiViewerAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     // the samples and the outer loop is handling the channels.
     // Alternatively, you can process the samples with the channels
     // interleaved by keeping the same state.
-    for (int channel = 0; channel < totalNumInputChannels; ++channel)
-    {
-        auto* channelData = buffer.getWritePointer (channel);
+    // ...
 
-        // ..do something to the data...
+    for(auto m = midiMessages.begin(); m != midiMessages.end(); ++m)
+    {
+        handleMidiMessage((*m).getMessage());
+    }
+}
+
+void MidiViewerAudioProcessor::handleMidiMessage(const juce::MidiMessage& message){
+    if(message.isNoteOn()){
+        int note = message.getNoteNumber();
+        if( note < 0 || note > 127){
+            return;
+        }
+
+        // float pitch = (message.getNoteNumber() - 69) / 12.0f;
+        float velocity = message.getVelocity() / 127.0f;
+        notes[note] = {velocity};
+    }
+
+    else if(message.isNoteOff()){
+        int note = message.getNoteNumber();
+        if( note < 0 || note > 127){
+            return;
+        }
+
+        notes[note] = {0.0f};
+    }
+
+    else if(message.isPitchWheel()) {
+        pitch_bend = message.getPitchWheelValue() / 8192.0f;
     }
 }
 

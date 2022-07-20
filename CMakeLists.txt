@@ -34,6 +34,8 @@ juce_add_plugin("${BaseTargetName}"
 juce_add_binary_data(binary_resources SOURCES
     resources/fifthsgon.svg
     resources/fifthstext.svg
+    resources/additive.vs
+    resources/additive.fs
 )
 
 juce_generate_juce_header(${BaseTargetName})
