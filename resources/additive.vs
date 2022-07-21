@@ -7,11 +7,11 @@ out float opacity;
 
 uniform float midi_velocities[128];
 
-float get_chord_opacity(int ch, bool major) {
+float get_chord_opacity() {
    float note_strengths[12] = float[12](0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 
    for(int i=0; i<128; i++){
-      note_strengths[i%12] = clamp( note_strengths[i%12] + midi_velocities[i], 0, 1 );
+      note_strengths[(i-chord)%12] = clamp( note_strengths[(i-chord)%12] + midi_velocities[i], 0, 1 );
    }
 
    float weights[12] = float[12](
@@ -29,13 +29,13 @@ float get_chord_opacity(int ch, bool major) {
        0.0  // Major Seventh
    );
 
-   if( major ){
-      weights[3] = -4.0;
-      weights[4] = 4.0;
+   if( chord_type == 1 ){
+      weights[3] = -0.4;
+      weights[4] = 0.4;
    }
    else{
-      weights[3] = 4.0;
-      weights[4] = -4.0;
+      weights[3] = 0.4;
+      weights[4] = -0.4;
    }
 
    float sum = 0.0;
@@ -43,13 +43,13 @@ float get_chord_opacity(int ch, bool major) {
       sum += weights[i] * note_strengths[i];
    }
 
-   return sum;
+   return sum; // Should be [-1,1]
 }
 
 float get_root_opacity(){
    float root = 0.0;
    for(int i=chord; i<128; i++){
-      if( mod(float(i),12.0) == float(chord) ){
+      if( i%12 == chord ){
          root += midi_velocities[i];
       }
    }
@@ -58,5 +58,5 @@ float get_root_opacity(){
 
 void main(){
    gl_Position = vec4(aPos,0,1);
-   opacity = clamp(get_root_opacity(), 0, 1);
+   opacity = clamp(get_chord_opacity(), 0, 1);
 }

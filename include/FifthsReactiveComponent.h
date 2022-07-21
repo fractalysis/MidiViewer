@@ -25,16 +25,16 @@ private:
 
     const int MAJOR_NOTE_OFFSETS[12] = {
         // A, Bb, B, C, Db, D, Eb, E, F, Gb, G, Ab
-           0, 5, 10, 3, 8,  1, 6, 11, 4, 9,  2, 7
+           9,  2, 7,  0, 5, 10, 3, 8, 1, 6, 11, 4, 
     };
     const int MINOR_NOTE_OFFSETS[12] = {
         // A, Bb, B, C, Db, D, Eb, E, F, Gb, G, Ab
-           3, 8,  1, 6, 11, 4, 9,  2, 7, 0,  5, 10
+           6, 11, 4, 9,  2, 7, 0,  5, 10, 3, 8,  1, 
     };
 
     struct Vertex {
         glm::vec2 position;
-        GLint chord; // 0 = A, 1 = Bb, 2 = B, etc.
+        GLint chord; // 0 = C, 1 = Db, 2 = E, etc.
         GLbyte chord_type; // 0 = minor, 1 = major
 
         Vertex() : position(glm::vec2(0.f)), chord(0), chord_type(0) {}
