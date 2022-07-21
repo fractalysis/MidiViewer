@@ -22,6 +22,10 @@ MidiViewerAudioProcessor::MidiViewerAudioProcessor()
                        )
 #endif
 {
+    // VERY NECESSARY
+    for(int i=0; i<NUM_MIDI_NOTES; i++){
+        notes[i]= {0.0f};
+    }
 }
 
 MidiViewerAudioProcessor::~MidiViewerAudioProcessor()

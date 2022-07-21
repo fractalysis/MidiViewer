@@ -32,24 +32,21 @@ void FifthsReactiveComponent::close(){
 }
 
 void FifthsReactiveComponent::render() {
-    // test
+    // For now until additive works
     glClear(GL_COLOR_BUFFER_BIT);
 
-    // Update the opacity using midi data rq
-    //updateTriangles();
+    // Bind buffer first
     openGLContext->extensions.glBindBuffer (GL_ARRAY_BUFFER, vertexBuffer);
-    //openGLContext->extensions.glBufferData (GL_ARRAY_BUFFER, tris.size() * (int) sizeof (Vertex),
-    //                                                tris.data(), GL_STATIC_DRAW);
 
     //VAO stuff (Not sure if we can make our own?)
     // Position
     openGLContext->extensions.glVertexAttribPointer (0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
     openGLContext->extensions.glEnableVertexAttribArray (0);
     // Chord info
-    openGLContext->extensions.glVertexAttribPointer (1, 1, GL_BYTE, GL_FALSE, sizeof(Vertex), (void*) sizeof(glm::vec2));
+    openGLContext->extensions.glVertexAttribPointer (1, 1, GL_INT, GL_FALSE, sizeof(Vertex), (void*) sizeof(glm::vec2));
     openGLContext->extensions.glEnableVertexAttribArray (1);
-    //openGLContext->extensions.glVertexAttribPointer(2, 1, GL_BYTE, GL_FALSE, sizeof(Vertex), (void*) (sizeof(glm::vec2) + sizeof(GLbyte)));
-    //openGLContext->extensions.glEnableVertexAttribArray (2);
+    openGLContext->extensions.glVertexAttribPointer(2, 1, GL_BYTE, GL_FALSE, sizeof(Vertex), (void*) (sizeof(glm::vec2) + sizeof(GLint)));
+    openGLContext->extensions.glEnableVertexAttribArray (2);
 
     // Enable blending
     glEnable(GL_BLEND);
@@ -69,7 +66,7 @@ void FifthsReactiveComponent::render() {
     // Clean up VAO
     openGLContext->extensions.glDisableVertexAttribArray (0);
     openGLContext->extensions.glDisableVertexAttribArray (1);
-    //openGLContext->extensions.glDisableVertexAttribArray (2);
+    openGLContext->extensions.glDisableVertexAttribArray (2);
 }
 
 // This function decides what the opacities of the chords are based on the notes being pressed

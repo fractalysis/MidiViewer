@@ -47,9 +47,9 @@ float get_chord_opacity(int ch, bool major) {
 }
 
 float get_root_opacity(){
-   float root = 0;
+   float root = 0.0;
    for(int i=chord; i<128; i++){
-      if( i%12 == chord ){
+      if( mod(float(i),12.0) == float(chord) ){
          root += midi_velocities[i];
       }
    }
