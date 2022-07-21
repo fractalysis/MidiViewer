@@ -10,9 +10,9 @@ bool FifthsReactiveComponent::initialize(){
     bool result = true;
 
     openGLContext->extensions.glGenBuffers (1, &vertexBuffer);
-    //openGLContext->extensions.glBindBuffer (GL_ARRAY_BUFFER, vertexBuffer);
-    //openGLContext->extensions.glBufferData (GL_ARRAY_BUFFER, tris.size() * (int) sizeof (Vertex),
-    //                                                tris.data(), GL_STATIC_DRAW);
+    openGLContext->extensions.glBindBuffer (GL_ARRAY_BUFFER, vertexBuffer);
+    openGLContext->extensions.glBufferData (GL_ARRAY_BUFFER, tris.size() * (int) sizeof (Vertex),
+                                                    tris.data(), GL_STATIC_DRAW);
 
     midiShader.reset(new OpenGLShaderProgram(*openGLContext));
     String vertexShader = String(BinaryData::additive_vs, BinaryData::additive_vsSize);
@@ -21,9 +21,7 @@ bool FifthsReactiveComponent::initialize(){
     result &= midiShader->addFragmentShader(fragmentShader);
     result &= midiShader->link();
 
-    if( !result ){
-        midiShader.reset();
-    }
+    jassert(result);
 
     return result;
 }
@@ -38,34 +36,44 @@ void FifthsReactiveComponent::render() {
     glClear(GL_COLOR_BUFFER_BIT);
 
     // Update the opacity using midi data rq
-    updateTriangles();
+    //updateTriangles();
     openGLContext->extensions.glBindBuffer (GL_ARRAY_BUFFER, vertexBuffer);
-    openGLContext->extensions.glBufferData (GL_ARRAY_BUFFER, tris.size() * (int) sizeof (FifthSection),
-                                                    tris.data(), GL_STATIC_DRAW);
+    //openGLContext->extensions.glBufferData (GL_ARRAY_BUFFER, tris.size() * (int) sizeof (Vertex),
+    //                                                tris.data(), GL_STATIC_DRAW);
 
     //VAO stuff (Not sure if we can make our own?)
     // Position
     openGLContext->extensions.glVertexAttribPointer (0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
     openGLContext->extensions.glEnableVertexAttribArray (0);
-    // Opacity
-    openGLContext->extensions.glVertexAttribPointer (1, 1, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*) sizeof(glm::vec2));
+    // Chord info
+    openGLContext->extensions.glVertexAttribPointer (1, 1, GL_BYTE, GL_FALSE, sizeof(Vertex), (void*) sizeof(glm::vec2));
     openGLContext->extensions.glEnableVertexAttribArray (1);
+    //openGLContext->extensions.glVertexAttribPointer(2, 1, GL_BYTE, GL_FALSE, sizeof(Vertex), (void*) (sizeof(glm::vec2) + sizeof(GLbyte)));
+    //openGLContext->extensions.glEnableVertexAttribArray (2);
 
     // Enable blending
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    // Draw
+    // Update uniforms
     midiShader->use();
-    glDrawArrays(GL_TRIANGLES, 0, tris.size() * 6); // 6 vertices per section
+    GLfloat velocities[128];
+    for(int i = 0; i < 128; i++){
+        velocities[i] = processor->notes[i].load().velocity;
+    }
+    midiShader->setUniform("midi_velocities", velocities, 128);
+
+    // Draw
+    glDrawArrays(GL_TRIANGLES, 0, tris.size());
 
     // Clean up VAO
     openGLContext->extensions.glDisableVertexAttribArray (0);
     openGLContext->extensions.glDisableVertexAttribArray (1);
+    //openGLContext->extensions.glDisableVertexAttribArray (2);
 }
 
 // This function decides what the opacities of the chords are based on the notes being pressed
-void FifthsReactiveComponent::updateTriangles(){
+/*void FifthsReactiveComponent::updateTriangles(){
     // Clear tris
     for(auto& shape : tris){
         shape.setOpacity(0.f);
@@ -111,4 +119,4 @@ void FifthsReactiveComponent::updateTriangles(){
         tris[ 2*MAJOR_NOTE_OFFSETS[i] ].setOpacity( major_positives[i].intensity()-major_negatives[i].intensity() );
         tris[ 2*MINOR_NOTE_OFFSETS[i]+1 ].setOpacity( minor_positives[i].intensity()-minor_negatives[i].intensity() );
     }
-}
+}*/

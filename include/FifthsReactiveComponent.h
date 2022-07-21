@@ -25,45 +25,50 @@ private:
 
     struct Vertex {
         glm::vec2 position;
-        GLfloat opacity;
+        GLbyte chord; // 0 = A, 1 = Bb, 2 = B, etc.
+        //GLbyte chord_type; // 0 = minor, 1 = major
 
-        Vertex() : position(glm::vec2(0.f)), opacity(0.f) {}
-        Vertex(const glm::vec2 pos) : position(pos), opacity(0.f) {}
+        Vertex() : position(glm::vec2(0.f)), chord(0) {}
+        Vertex(const glm::vec2 pos, int chord, bool major) : position(pos), chord(chord) /*, chord_type(major)*/ {}
+        bool isMajor() const { return chord & 0x80; }
     };
 
-    struct FifthSection {
-        Vertex verts[6]; // 2 triangles
-
-        FifthSection(const GLfloat inner, const GLfloat outer, const GLfloat angle) {
-            glm::vec2 polars[6] = {
-                glm::vec2(outer, glm::radians(angle-15.f)),
-                glm::vec2(outer, glm::radians(angle+15.f)),
-                glm::vec2(inner, glm::radians(angle+15.f)),
-                glm::vec2(inner, glm::radians(angle+15.f)),
-                glm::vec2(inner, glm::radians(angle-15.f)),
-                glm::vec2(outer, glm::radians(angle-15.f))
-            };
-
-            for(int i=0; i<6; i++) {
-                verts[i] = Vertex(glm::vec2(glm::cos(polars[i].y) * polars[i].x, glm::sin(polars[i].y) * polars[i].x));
-            }
-        }
-
-        void setOpacity(const GLfloat opacity) {
-            for(int i=0; i<6; i++) {
-                verts[i].opacity = opacity;
-            }
-        }
-    };
-
-    const std::vector<FifthSection> getShape(){
-        std::vector<FifthSection> tris;
+    std::vector<Vertex> getShape(){
+        std::vector<Vertex> tris;
         // Make the shape once for each key
         for(int i=0; i<12; i++){
-            // Outer circle
-            tris.push_back(FifthSection(SPLIT_RADIUS, OUTER_RADIUS, i*30.f));
-            // Inner circle
-            tris.push_back(FifthSection(INNER_RADIUS, SPLIT_RADIUS, i*30.f));
+            glm::vec2 major[6] = {
+                glm::vec2(OUTER_RADIUS, glm::radians(i*30.f-15.f)),
+                glm::vec2(OUTER_RADIUS, glm::radians(i*30.f+15.f)),
+                glm::vec2(SPLIT_RADIUS, glm::radians(i*30.f+15.f)),
+                glm::vec2(SPLIT_RADIUS, glm::radians(i*30.f+15.f)),
+                glm::vec2(SPLIT_RADIUS, glm::radians(i*30.f-15.f)),
+                glm::vec2(OUTER_RADIUS, glm::radians(i*30.f-15.f))
+            };
+
+            for(int j=0; j<6; j++) {
+                tris.push_back(Vertex(
+                    glm::vec2(glm::cos(major[j].y) * major[j].x, glm::sin(major[j].y) * major[j].x),
+                    MAJOR_NOTE_OFFSETS[i], true
+                ));
+            }
+
+            glm::vec2 minor[6]= {
+                glm::vec2(SPLIT_RADIUS, glm::radians(i*30.f-15.f)),
+                glm::vec2(SPLIT_RADIUS, glm::radians(i*30.f+15.f)),
+                glm::vec2(INNER_RADIUS, glm::radians(i*30.f+15.f)),
+                glm::vec2(INNER_RADIUS, glm::radians(i*30.f+15.f)),
+                glm::vec2(INNER_RADIUS, glm::radians(i*30.f-15.f)),
+                glm::vec2(SPLIT_RADIUS, glm::radians(i*30.f-15.f))
+            };
+
+            for(int j=0; j<6; j++) {
+                tris.push_back(Vertex(
+                    glm::vec2(glm::cos(minor[j].y) * minor[j].x, glm::sin(minor[j].y) * minor[j].x),
+                    MINOR_NOTE_OFFSETS[i], false
+                ));
+            }
+
         }
         return tris;
     }
@@ -77,9 +82,9 @@ private:
            3, 8,  1, 6, 11, 4, 9,  2, 7, 0,  5, 10
     };
 
-    std::vector<FifthSection> tris = getShape();
+    std::vector<Vertex> tris = getShape();
 
-    void updateTriangles();
+    //void updateTriangles();
 
     MidiViewerAudioProcessor* processor;
     GLuint vertexBuffer;

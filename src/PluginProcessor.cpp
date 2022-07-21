@@ -184,7 +184,7 @@ void MidiViewerAudioProcessor::handleMidiMessage(const juce::MidiMessage& messag
         }
 
         if( sustain ){
-            notes_to_stop.push_back(note);
+            notes_to_stop.push_back(note); // i know i know no mallocs on the realtime thread >:
         }
         else{
             notes[note] = {0.0f};
