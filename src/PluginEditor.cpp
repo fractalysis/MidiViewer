@@ -13,6 +13,8 @@
 MidiViewerAudioProcessorEditor::MidiViewerAudioProcessorEditor (MidiViewerAudioProcessor& p)
     : OpenGLEditor (&p), audioProcessor (p), comp(&p)
 {
+    addAndMakeVisible(comp);
+
     // Create the svg background
     //std::unique_ptr<XmlElement> svg_root(XmlDocument::parse(BinaryData::fifthstext_svg, BinaryData::fifthstext_svgSize));
     //jassert(svg_root != nullptr);
@@ -20,8 +22,6 @@ MidiViewerAudioProcessorEditor::MidiViewerAudioProcessorEditor (MidiViewerAudioP
     bg = Drawable::createFromImageData(BinaryData::fifthstext_svg, BinaryData::fifthstext_svgSize);
     jassert(bg != nullptr);
     addAndMakeVisible (*bg);
-
-    addAndMakeVisible(comp);
 
     // Make it resizeable as a square
     getConstrainer()->setFixedAspectRatio(1.0);
