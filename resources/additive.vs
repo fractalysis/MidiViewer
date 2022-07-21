@@ -6,6 +6,7 @@ layout (location = 2) in int chord_type;
 out float opacity;
 
 uniform float midi_velocities[128];
+uniform float pitch_bend;
 
 float get_chord_opacity() {
    float note_strengths[12] = float[12](0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);

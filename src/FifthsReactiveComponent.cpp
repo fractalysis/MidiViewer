@@ -43,9 +43,9 @@ void FifthsReactiveComponent::render() {
     glVertexAttribPointer (0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
     glEnableVertexAttribArray (0);
     // Chord info
-    glVertexAttribIPointer (1, 1, GL_INT, sizeof(Vertex), (void*) sizeof(glm::vec2));
+    glVertexAttribIPointer (1, 1, GL_BYTE, sizeof(Vertex), (void*) sizeof(glm::vec2));
     glEnableVertexAttribArray (1);
-    glVertexAttribIPointer(2, 1, GL_BYTE, sizeof(Vertex), (void*) (sizeof(glm::vec2) + sizeof(GLint)));
+    glVertexAttribIPointer(2, 1, GL_BYTE, sizeof(Vertex), (void*) (sizeof(glm::vec2) + sizeof(GLbyte)));
     glEnableVertexAttribArray (2);
 
     // Enable blending
@@ -59,6 +59,8 @@ void FifthsReactiveComponent::render() {
         velocities[i] = processor->notes[i].load().velocity;
     }
     midiShader->setUniform("midi_velocities", velocities, 128);
+    GLfloat pitch_bend = processor->pitch_bend.load();
+    midiShader->setUniform("pitch_bend", pitch_bend);
 
     // Draw
     glDrawArrays(GL_TRIANGLES, 0, tris.size());

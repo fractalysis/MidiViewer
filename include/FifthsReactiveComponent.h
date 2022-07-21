@@ -34,11 +34,11 @@ private:
 
     struct Vertex {
         glm::vec2 position;
-        GLint chord; // 0 = C, 1 = Db, 2 = E, etc.
+        GLbyte chord; // 0 = C, 1 = Db, 2 = E, etc.
         GLbyte chord_type; // 0 = minor, 1 = major
 
         Vertex() : position(glm::vec2(0.f)), chord(0), chord_type(0) {}
-        Vertex(const glm::vec2 pos, int chord, bool major) : position(pos), chord(chord), chord_type((GLbyte) major) {}
+        Vertex(const glm::vec2 pos, int chord, bool major) : position(pos), chord((GLbyte) chord), chord_type((GLbyte) major) {}
         bool isMajor() const { return chord_type == 1; }
     };
 
