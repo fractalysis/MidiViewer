@@ -64,6 +64,9 @@ public:
 
     std::atomic<float> pitch_bend;
 
+    bool sustain = false;
+    std::vector<int> notes_to_stop;
+
 private:
     void handleMidiMessage (const juce::MidiMessage& message);
 

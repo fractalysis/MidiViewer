@@ -166,6 +166,15 @@ void MidiViewerAudioProcessor::handleMidiMessage(const juce::MidiMessage& messag
         // float pitch = (message.getNoteNumber() - 69) / 12.0f;
         float velocity = message.getVelocity() / 127.0f;
         notes[note] = {velocity};
+
+        if( sustain ){
+            for(auto itr = notes_to_stop.begin(); itr != notes_to_stop.end(); ++itr){
+                if( *itr == note ){
+                    notes_to_stop.erase(itr);
+                    //break; //commenting out just in case note off's duplicate ig ??
+                }
+            }
+        }
     }
 
     else if(message.isNoteOff()){
@@ -174,7 +183,22 @@ void MidiViewerAudioProcessor::handleMidiMessage(const juce::MidiMessage& messag
             return;
         }
 
-        notes[note] = {0.0f};
+        if( sustain ){
+            notes_to_stop.push_back(note);
+        }
+        else{
+            notes[note] = {0.0f};
+        }
+    }
+
+    else if(message.isSustainPedalOn()){
+        sustain = true;
+    }
+    else if(message.isSustainPedalOff()){
+        sustain = false;
+        for(auto note : notes_to_stop){
+            notes[note] = {0.0f};
+        }
     }
 
     else if(message.isPitchWheel()) {
